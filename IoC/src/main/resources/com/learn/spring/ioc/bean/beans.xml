@@ -11,13 +11,15 @@
           p:maxSpeed="200"
     />
 
-    <bean id="customAutowireConfigurer"
-          class="org.springframework.beans.factory.annotation.CustomAutowireConfigurer">
-        <property name="customQualifierTypes">
-            <set>
-                <value>test.FineQualifier</value>
-            </set>
-        </property>
-    </bean>
+    <bean id="student" class="com.learn.spring.ioc.bean.pojo.Student"
+          init-method="init" destroy-method="destroy"
+          p:studentId="1"
+          p:score="87.5"
+          p:rank="1"
+    />
 
+    <bean id="MyBeanFactoryPostProcessor"
+          class="com.learn.spring.ioc.bean.beanfactory.MyBeanFactoryPostProcessor"/>
+
+    <bean id="MyBeanPostProcessor" class="com.learn.spring.ioc.bean.beanfactory.MyBeanPostProcessor"/>
 </beans>

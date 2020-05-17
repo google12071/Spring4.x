@@ -8,13 +8,13 @@ import org.springframework.beans.factory.config.InstantiationAwareBeanPostProces
 import java.beans.PropertyDescriptor;
 
 /**
- * @ClassName CarInstantiationAwareBeanPostProcessor
+ * @ClassName MyInstantiationAwareBeanPostProcessor
  * @Description:
  * @Author lfq
  * @Date 2020/5/17
  **/
 @Slf4j
-public class CarInstantiationAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter {
+public class MyInstantiationAwareBeanPostProcessor extends InstantiationAwareBeanPostProcessorAdapter {
     @Override
     public Object postProcessBeforeInstantiation(Class beanClass, String beanName) throws BeansException {
         if ("car".equals(beanName)) {

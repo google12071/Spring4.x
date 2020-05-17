@@ -6,13 +6,13 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 
 /**
- * @ClassName CarBeanPostProcessor
+ * @ClassName MyBeanPostProcessor
  * @Description:BeanPostProcessor属于容器级别控制
  * @Author lfq
  * @Date 2020/5/17
  **/
 @Slf4j
-public class CarBeanPostProcessor implements BeanPostProcessor {
+public class MyBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         if ("car".equals(beanName)) {

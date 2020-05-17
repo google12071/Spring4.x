@@ -1,7 +1,7 @@
 package com.learn.spring.ioc.bean;
 
-import com.learn.spring.ioc.bean.beanfactory.CarBeanPostProcessor;
-import com.learn.spring.ioc.bean.beanfactory.CarInstantiationAwareBeanPostProcessor;
+import com.learn.spring.ioc.bean.beanfactory.MyBeanPostProcessor;
+import com.learn.spring.ioc.bean.beanfactory.MyInstantiationAwareBeanPostProcessor;
 import com.learn.spring.ioc.bean.pojo.Car;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -27,10 +27,10 @@ public class BeanLifeCycleTest {
         reader.loadBeanDefinitions(res);
 
         //向容器中注册CarBeanPostProcessor后处理器
-        ((ConfigurableBeanFactory) bf).addBeanPostProcessor(new CarBeanPostProcessor());
+        ((ConfigurableBeanFactory) bf).addBeanPostProcessor(new MyBeanPostProcessor());
 
         //向容器中注册CarInstantiationAwareBeanPostProcessor后处理器
-        ((ConfigurableBeanFactory) bf).addBeanPostProcessor(new CarInstantiationAwareBeanPostProcessor());
+        ((ConfigurableBeanFactory) bf).addBeanPostProcessor(new MyInstantiationAwareBeanPostProcessor());
 
         //首次从容器中获取car，将触发容器实例化该Bean，这将引发Bean生命周期方法的调用。
         Car car1 = (Car) bf.getBean("car");
