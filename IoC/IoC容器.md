@@ -1,45 +1,63 @@
-## IoC容器
+## SpringBean生命周期
 
-### 一、基础
+ Spring容器管理Bean的过程中,Bean的生命周期会包括创建、初始化、属性复制、销毁等操作,正确理解Bean的生命周期对于开发者至关重要,POJO对象通过实现BeanFactoryAware, BeanNameAware, InitializingBean, DisposableBean等接口,可以对Bean的生命周期做定制,满足个性化需求.本文分别对BeanFactory和ApplicationCOntext中Bean的生命周期进行分析,期望进一步加深对Spring容器的理解.
 
-- IoC概念
+### 一、BeanFactory
 
-  控制反转,包含两层含义,控制表示Bean创建及管理交由Spring容器统一控制管理;反转表示原先类的创建、初始化、赋值等操作从调用类中剥离,转交由Spring容器统一管理,从而实现Bean依赖解耦合.
+- BeanFactory生命周期图解
 
-  > IoC控制反转理解起来相对抽象,软件界泰斗级人物Martin Fowler提出DI(依赖注入)的概念,即调用类对某一接口的实现类的依赖关系由第三方(容器或写作文类)注入,以移除调用类对某一接口实现类的依赖,DI(依赖注入)相对IoC更形象直观.
+  ![image-20200517145619140](https://tva1.sinaimg.cn/large/007S8ZIlly1gevgdix71pj314b0u0e82.jpg)
 
-- IoC类型
+- 核心处理流程
 
-  - 构造器注入
+   当调用者通过getBean(beanName)从容器请求某一个Bean时,其生命周期大致会经历以下步骤:
 
-    将接口实现类通过构造器函数传入
+  - 若容器注册了InstantiationAwareBeanPostProcessor接口,则在实例化之前,将调用该接口的postProcessBeforeInstantiation方法
+  - 根据配置调用Bean的构造函数或工厂方法实例化Bean
+  - 若容器注册了InstantiationAwareBeanPostProcessor接口,则在实例化之后,将调用该接口的postProcessAfterInstantiation方法
+  - 若Bean配置了属性值信息,则容器下一步将设置属性值到对应的属性中,在此之前会先调用接口的postProcessPropertyValues方法
+  - 调用Bean的属性设置方法(Setter)方法设置属性值
+  - 若Bean实现了BeanNameAware接口,则将调用setBeanName方法,将配置文件中Bean对应的的名称设置到Bean中
+  - 若Bean实现了BeanFactoryAware接口,则将调用setBeanFactory方法,将BeanFactory容器实例设置到Bean中
+  - 若BeanFactory装配了BeanPostProcessor后处理器,则将调用BeanPostProcessor的Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException方法对Bean进行处理,其中入参bean是当前正在处理的bean,beanName是Bean的配置名,返回加工处理后的对象.BeanPostProcessor在Spring中占有重要地位,通过实现该接口,可以对Bean进行改造.
+  - 若Bean实现了InitializingBean接口,则将调用afterPropertiesSet方法
+  - 通过Bean定义,调用init-method方法,该方法可完成一些初始化工作
+  - 若BeanFactory装配了BeanPostProcessor后处理器,则调用postProcessAfterInitialization方法,该方法可再次修改Bean
+  - 若Bean定义为单例,则查看Spring缓存池中是否存在准备就绪的Bean,若有直接返回;若无,创建单例模Bean,并放入缓存池,下次获取Bean时,直接返回;若Bean定义为prototype,每次获取Bean都新创建
+  - 若Bean中定义destroy方法,则销毁容器后,将完成Bean的销毁或资源释放操作.
 
-  - 属性注入
+- 方法分类
 
-    通过Setter方法完成调用类所需依赖的注入,相对于构造器注入,更加灵活方便.
+  - Bean自身方法
 
-  - 接口注入(不建议使用)
+    构造方法、Setter方法、init-method、destroy-method
 
-    将调用类依赖注入的方法抽取到一个接口中,调用类通过实现该接口提供相应的注入方法.此法需要格外新增接口,与构造器注入、属性注入无本质区别,但增加类数量,不建议使用
+  - Bean级生命周期接口方法
 
-### 二、BeanFactory
+    由Bean实现接口实现
 
- BeanFacotry是Spring框架的基础设施,面向Spring本身,常用于表示为Spring容器
+  - 容器级生命周期接口方法
 
-> BeanFactory启动IoC容器时,并不会初始化配置文件中定义的Bean,初始化完成在首次调用时,对于单利类型,BeanFactory会缓存Bean实例,以后通过getBean()方法获取Bean时,将直接从缓存中获取Bean实例.
+    由InstantiationAwareBeanPostProcessor和BeanPostProcessor两个接口实现,一般称它们的实现类为“后处理器”,后处理器接口一般不由Bean本身实现,它的影响为全局性的.开发者通过合理编写后处理器,可对感兴趣的Bean进行加工处理
 
-### 三、ApplicationContext
+  - 工厂后处理器接口方法
 
-ApplicationContext面向Spring框架开发者,提供了国际化支持和框架事件体系,继承自BeanFactory,开发中一般选择ApplicationContext,而非更底层的BeanFactory
+    工厂后处理器也是容器级的,应用上下文装配配置文件后立即调用
 
-- 继承体系
+    Bean级生命周期接口和容器级生命周期接口时个性和共性辩证统一的体现,前者解决Bean个性化处理问题,后者解决容器中Bean共性处理问题
 
-  ![image-20200517141330068](https://tva1.sinaimg.cn/large/007S8ZIlly1gevf505h0qj31xc0cmabd.jpg)
+### 二、ApplicationContext
 
-  相对于BeanFactory,ApplicationContext提供了更完善的管理Bean的方法,其主要实现类是ClassPathXmlApplicationContext和FileSystemXmlApplicationContext,前者默认从类路径加载配置文件,后者默认从文件系统中加载配置文件.
+- ApplicationContext生命周期图图解
 
-> ApplicationContext初始化和BeanFacotry有一个重大区别:BeanFacotry当首次访问某个Bean时,才实例化目标Bean,初始化容器时,并未初始化Bean;ApplicationContext初始化应用上下文时即完成所有单例Bean的初始化,启动初始化时间相对较长,但后续获取Bean无需再次初始化.
+  ![image-20200517151828983](https://tva1.sinaimg.cn/large/007S8ZIlly1gevh0ltqqfj311u0u04qr.jpg)
 
-- WebApplicationContext
+- ApplicationContext与BeanFactory生命周期对比
 
-  Spring专门为Web应用设计而生,它允许从相对于Web根目录的路径中装载配置文件并完成初始化工作.
+  BeanFactory需要手动注册后处理器,开发者通过ApplicationContext管理Bean的生命周期.Application会利用Java反射机制自动识别出配置文件中定义的BeanPostProcessor,并自动将它们注册到应用上下文中.后者需要手工注册,ApplicationContext可以自动注册.
+
+### 三、核心接口及实现类
+
+- BeanFactoryAware, BeanNameAware, InitializingBean, DisposableBean
+- InstantiationAwareBeanPostProcessor
+- BeanPostProcessor
