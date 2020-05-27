@@ -15,12 +15,18 @@
         <spring.version>4.2.2.RELEASE</spring.version>
         <lombok.version>1.18.10</lombok.version>
         <logback-classic.version>1.2.3</logback-classic.version>
+        <asm.version>4.0</asm.version>
+        <cglib.version>3.0</cglib.version>
+        <aspectj.version>1.8.1</aspectj.version>
+        <aopalliance.version>1.0</aopalliance.version>
+        <commons-codec.version>1.9</commons-codec.version>
         <testng.version>6.8.7</testng.version>
         <unitils.version>3.4.2</unitils.version>
     </properties>
 
     <modules>
         <module>IoC</module>
+        <module>AOP</module>
     </modules>
 
     <dependencies>

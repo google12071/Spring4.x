@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>IoC</artifactId>
+    <packaging>jar</packaging>
     <description>IoC容器相关知识梳理</description>
-
 
 </project>
