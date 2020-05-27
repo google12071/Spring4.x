@@ -2,7 +2,10 @@ package com.learn.spring.aop.aspect;
 
 import com.learn.spring.aop.aspect.impl.NativeWaiter;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @ClassName AspectTest
@@ -12,9 +15,9 @@ import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
  **/
 @Slf4j
 public class AspectTest {
-    public static void main(String[] args) {
+    @Test
+    public void addAspectManual() {
         Waiter waiter = new NativeWaiter();
-
         AspectJProxyFactory proxyFactory = new AspectJProxyFactory();
         proxyFactory.setTarget(waiter);
         proxyFactory.addAspect(WaiterServerAspect.class);
@@ -22,5 +25,13 @@ public class AspectTest {
         Waiter proxy = proxyFactory.getProxy();
         proxy.greetTo("fq");
         proxy.serveTo("fq");
+    }
+
+    @Test
+    public void addAspectBySchema() {
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:/aop/aop-beans.xml");
+        Waiter waiter = (Waiter) context.getBean("waiter");
+        waiter.greetTo("fq");
+        waiter.serveTo("fq");
     }
 }
